@@ -92,10 +92,15 @@ def main () :
       
       if event.type == pygame.KEYDOWN and event.key == K_w:
         #print(origlocs[entities[0][4]][0])
+        if entities[0][5] >= (WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)): - WINDOW_WIDTH//maxsize:
+          entities[0][5] = -(WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)) + WINDOW_WIDTH//maxsize
         entities[0][0][1] = origlocs[entities[0][5] + WINDOW_WIDTH//maxsize][1]
         entities[0][5] += WINDOW_WIDTH//maxsize
       
       if event.type == pygame.KEYDOWN and event.key == K_s:
+        #print(-(WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)))
+        if entities[0][5] <= -(WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)) + WINDOW_WIDTH//maxsize:
+          entities[0][5] = 0
         entities[0][0][1] = origlocs[entities[0][5] - WINDOW_WIDTH//maxsize][1]
         entities[0][5] -= WINDOW_WIDTH//maxsize
     
