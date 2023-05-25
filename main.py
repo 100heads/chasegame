@@ -15,26 +15,29 @@ WINDOW_HEIGHT = 400
 WINDOW = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption('My Game!')
 
-maxsize = 0
-while maxsize < 1 or maxsize > WINDOW_WIDTH*WINDOW_HEIGHT:
-  maxsize = input('Maximum entity size: ')
-  try:
-    maxsize = int(maxsize)
-  except:
-    maxsize = 0
+def definesizes():
+  global maxsize, minsize
+  maxsize = 5
+  while maxsize < 1 or maxsize > WINDOW_WIDTH*WINDOW_HEIGHT:
+    maxsize = input('Maximum entity size: ')
+    try:
+      maxsize = int(maxsize)
+    except:
+      maxsize = 0
+  
+  minsize = 0
+  while minsize < 1 or minsize > maxsize:
+    minsize = input('Minimum entity size (less than %s): '% maxsize)
+    try:
+      minsize = int(minsize)
+    except:
+      minsize = 0
 
-minsize = 0
-while minsize < 1 or minsize > maxsize:
-  minsize = input('Minimum entity size: ')
-  try:
-    minsize = int(minsize)
-  except:
-    minsize = 0
-
-entmax = WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)
-characters = -1
 def characterinput():
-  global characters
+  global maxsize, minsize
+  entmax = WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)
+  characters = -1
+  global entmax, characters
   characters = input('Character amount (maximum of %i): ' % entmax)
   try:
     while int(characters) > entmax or int(characters) < 0:
@@ -44,31 +47,40 @@ def characterinput():
 characterinput()
 characters = int(characters)
 
-locs = list()
-o = WINDOW_WIDTH + maxsize
-u = WINDOW_HEIGHT - maxsize
-#p = WINDOW_WIDTH*WINDOW_HEIGHT/(WINDOW_WIDTH*WINDOW_HEIGHT/WINDOW_WIDTH)
-for i in range(WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)):
-  o -= maxsize
-  if o == 0:
-    o = WINDOW_WIDTH - maxsize
-    if u != 0:
-      u -= maxsize
-    #p = WINDOW_WIDTH*WINDOW_HEIGHT/(WINDOW_WIDTH*WINDOW_HEIGHT/(WINDOW_WIDTH/(((i + 1)*50)/4)))
-  locs.append([o,u])
-  origlocs = locs
-entities = list()
-for i in range(characters):
-  u = random.randint(0,len(locs) - 1)
-  o = locs[u]
-  size = random.randint(minsize,maxsize)
-  entities.append([o,size,size,(6,36,216),u,u,u,u])
-  del(locs[u])
+def createlocs():
+  global locs, origlocs
+  locs = list()
+  o = WINDOW_WIDTH + maxsize
+  u = WINDOW_HEIGHT - maxsize
+  #p = WINDOW_WIDTH*WINDOW_HEIGHT/(WINDOW_WIDTH*WINDOW_HEIGHT/WINDOW_WIDTH)
+  for i in range(WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)):
+    o -= maxsize
+    if o == 0:
+      o = WINDOW_WIDTH - maxsize
+      if u != 0:
+        u -= maxsize
+      #p = WINDOW_WIDTH*WINDOW_HEIGHT/(WINDOW_WIDTH*WINDOW_HEIGHT/(WINDOW_WIDTH/(((i + 1)*50)/4)))
+    locs.append([o,u])
+    origlocs = locs
+def create_entities():
+  global locs, entities
+  entities = list()
+  for i in range(characters):
+    u = random.randint(0,len(locs) - 1)
+    o = locs[u]
+    size = random.randint(minsize,maxsize)
+    entities.append([o,size,size,(6,36,216),u,u,u,u])
+    del(locs[u])
 
 
 # Titlescreen function
-gameongoing = False
 def titlescreen():
+  global gameongoing
+  definesizes()
+  characterinput()
+  createlocs()
+  create_entities()
+  gameongoing = False
   while gameongoing == False:
     for event in pygame.event.get() :
       if event.type == QUIT :
@@ -81,9 +93,14 @@ def titlescreen():
         main()
       
       #rendering
-      title = pass
-      pygame.draw.rect(WINDOW,(200,160,5),title)
-    
+      WINDOW.fill((200,160,5))
+      title = pygame.font.SysFont(pygame.font.get_fonts()[4], 40)
+      surfacetitle = title.render('Herding Cats', True, (200,100,10), None)
+      WINDOW.blit(surfacetitle,(WINDOW_WIDTH/6,WINDOW_HEIGHT/4))
+      subtitle = pygame.font.Font(None, 25)
+      surfacesubtitle = subtitle.render('Press H to begin.', True, (200,120,0), None)
+      WINDOW.blit(surfacesubtitle,(WINDOW_WIDTH/6,WINDOW_HEIGHT/2.7))
+      pygame.display.update()
 
 # Win function
 def win():
@@ -92,12 +109,11 @@ def win():
 # The main function that controls the game
 
 def main () :
-  #t = 0
+  global looping,locs,entities,origlocs, gameongoing
   looping = True
   
   # The main game loop
   while looping :
-    #t += 1
     # Get inputs
     for event in pygame.event.get() :
       if event.type == QUIT :
@@ -130,7 +146,8 @@ def main () :
     
     # Processing
     if len(entities) == 1:
-      win()
+      looping = False
+      titlescreen()
     for i in range(len(entities) - 1):
       o = i + 1
       try:
