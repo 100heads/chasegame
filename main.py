@@ -4,7 +4,7 @@ pygame.init()
 
 
 # Colours
-BACKGROUND = (255, 255, 255)
+BACKGROUND = (210, 220, 210)
  
 # Game Setup
 FPS = 60
@@ -27,25 +27,25 @@ def definesizes():
   
   minsize = 0
   while minsize < 1 or minsize > maxsize:
-    minsize = input('Minimum entity size (less than %s): '% maxsize)
+    minsize = input('Minimum entity size (less than or equal to %s): '% maxsize)
     try:
       minsize = int(minsize)
     except:
       minsize = 0
 
 def characterinput():
-  global maxsize, minsize
+  global maxsize, minsize, entmax, characters
   entmax = WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)
   characters = -1
-  global entmax, characters
+  
   characters = input('Character amount (maximum of %i): ' % entmax)
   try:
     while int(characters) > entmax or int(characters) < 0:
       characters = input('Character amount (maximum of %i): ' % entmax)
   except:
     characterinput()
-characterinput()
-characters = int(characters)
+#characterinput()
+#characters = int(characters)
 
 def createlocs():
   global locs, origlocs
@@ -62,6 +62,7 @@ def createlocs():
       #p = WINDOW_WIDTH*WINDOW_HEIGHT/(WINDOW_WIDTH*WINDOW_HEIGHT/(WINDOW_WIDTH/(((i + 1)*50)/4)))
     locs.append([o,u])
     origlocs = locs
+
 def create_entities():
   global locs, entities
   entities = list()
@@ -69,15 +70,19 @@ def create_entities():
     u = random.randint(0,len(locs) - 1)
     o = locs[u]
     size = random.randint(minsize,maxsize)
-    entities.append([o,size,size,(6,36,216),u,u,u,u])
+    if i == 0:
+      entities.append([o,5,5,(72,216,6),u,u,u,u])
+    else:
+      entities.append([o,size,size,random.choice([(200,200,0),(0,0,0),(200,140,0),(240,240,240),(180,180,180)]),u,u,u,u])
     del(locs[u])
 
 
 # Titlescreen function
 def titlescreen():
-  global gameongoing
+  global gameongoing, characters
   definesizes()
   characterinput()
+  characters = int(characters)
   createlocs()
   create_entities()
   gameongoing = False
@@ -134,7 +139,11 @@ def main () :
         #print(origlocs[entities[0][4]][0])
         if entities[0][5] >= (WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)) - WINDOW_WIDTH//maxsize:
           entities[0][5] = -(WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)) + WINDOW_WIDTH//maxsize
-        entities[0][0][1] = origlocs[entities[0][5] + WINDOW_WIDTH//maxsize][1]
+        try:
+          entities[0][0][1] = origlocs[entities[0][5] + WINDOW_WIDTH//maxsize][1]
+        except:
+          entities[0][5] = -(WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)) + WINDOW_WIDTH//maxsize
+          entities[0][0][1] = origlocs[entities[0][5] + WINDOW_WIDTH//maxsize][1]
         entities[0][5] += WINDOW_WIDTH//maxsize
       
       if event.type == pygame.KEYDOWN and event.key == K_s:
@@ -162,7 +171,11 @@ def main () :
         if random.randint(1,5) == 1:
           if entities[o][5] >= (WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)) - WINDOW_WIDTH//maxsize:
             entities[o][5] = -(WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)) + WINDOW_WIDTH//maxsize
-          entities[o][0][1] = origlocs[entities[o][5] + WINDOW_WIDTH//maxsize][1]
+          try:
+            entities[o][0][1] = origlocs[entities[o][5] + WINDOW_WIDTH//maxsize][1]
+          except:
+            entities[o][5] = -(WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)) + WINDOW_WIDTH//maxsize
+            entities[o][0][1] = origlocs[entities[o][5] + WINDOW_WIDTH//maxsize][1]
           entities[o][5] += WINDOW_WIDTH//maxsize
       
         if random.randint(1,5) == 1:
@@ -190,7 +203,6 @@ def main () :
 
 
 titlescreen()
-
 
 
 
