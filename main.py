@@ -1,4 +1,4 @@
-import pygame, sys, random
+import pygame, sys, random, math
 from pygame.locals import *
 pygame.init()
 
@@ -62,7 +62,7 @@ for i in range(characters):
   u = random.randint(0,len(locs) - 1)
   o = locs[u]
   size = random.randint(minsize,maxsize)
-  entities.append([o,size,size,(6,36,216),u,1*(u//50 + 1)*maxsize,u,u])
+  entities.append([o,size,size,(6,36,216),u,u,u,u])
   del(locs[u])
 
 # The main function that controls the game
@@ -92,12 +92,12 @@ def main () :
       
       if event.type == pygame.KEYDOWN and event.key == K_w:
         #print(origlocs[entities[0][4]][0])
-        entities[0][0][1] = origlocs[entities[0][5] + 1][0]
-        entities[0][5] += 1
+        entities[0][0][1] = origlocs[entities[0][5] + WINDOW_WIDTH//maxsize][1]
+        entities[0][5] += WINDOW_WIDTH//maxsize
       
       if event.type == pygame.KEYDOWN and event.key == K_s:
-        entities[0][0][1] = origlocs[entities[0][5] - 1][0]
-        entities[0][5] -= 1
+        entities[0][0][1] = origlocs[entities[0][5] - WINDOW_WIDTH//maxsize][1]
+        entities[0][5] -= WINDOW_WIDTH//maxsize
     
     # Processing
     # This section will be built out later
