@@ -65,15 +65,39 @@ for i in range(characters):
   entities.append([o,size,size,(6,36,216),u,u,u,u])
   del(locs[u])
 
+
+# Titlescreen function
+gameongoing = False
+def titlescreen():
+  while gameongoing == False:
+    for event in pygame.event.get() :
+      if event.type == QUIT :
+        pygame.quit()
+        sys.exit()
+      
+      pressed = pygame.key.get_pressed()
+      if event.type == pygame.KEYDOWN and event.key == K_h:
+        gameongoing = True
+        main()
+      
+      #rendering
+      title = pass
+      pygame.draw.rect(WINDOW,(200,160,5),title)
+    
+
+# Win function
+def win():
+  pass
+
 # The main function that controls the game
 
 def main () :
-  t = 0
+  #t = 0
   looping = True
   
   # The main game loop
   while looping :
-    t += 1
+    #t += 1
     # Get inputs
     for event in pygame.event.get() :
       if event.type == QUIT :
@@ -92,7 +116,7 @@ def main () :
       
       if event.type == pygame.KEYDOWN and event.key == K_w:
         #print(origlocs[entities[0][4]][0])
-        if entities[0][5] >= (WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)): - WINDOW_WIDTH//maxsize:
+        if entities[0][5] >= (WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)) - WINDOW_WIDTH//maxsize:
           entities[0][5] = -(WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)) + WINDOW_WIDTH//maxsize
         entities[0][0][1] = origlocs[entities[0][5] + WINDOW_WIDTH//maxsize][1]
         entities[0][5] += WINDOW_WIDTH//maxsize
@@ -105,6 +129,36 @@ def main () :
         entities[0][5] -= WINDOW_WIDTH//maxsize
     
     # Processing
+    if len(entities) == 1:
+      win()
+    for i in range(len(entities) - 1):
+      o = i + 1
+      try:
+        if random.randint(1,5) == 1:
+          entities[o][0][0] = origlocs[entities[o][4] - 1][0]
+          entities[o][4] -= 1
+      
+        if random.randint(1,5) == 1:
+          entities[o][0][0] = origlocs[entities[o][4] + 1][0]
+          entities[o][4] += 1
+      
+        if random.randint(1,5) == 1:
+          if entities[o][5] >= (WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)) - WINDOW_WIDTH//maxsize:
+            entities[o][5] = -(WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)) + WINDOW_WIDTH//maxsize
+          entities[o][0][1] = origlocs[entities[o][5] + WINDOW_WIDTH//maxsize][1]
+          entities[o][5] += WINDOW_WIDTH//maxsize
+      
+        if random.randint(1,5) == 1:
+          if entities[o][5] <= -(WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)) + WINDOW_WIDTH//maxsize:
+            entities[o][5] = 0
+          entities[o][0][1] = origlocs[entities[o][5] - WINDOW_WIDTH//maxsize][1]
+          entities[o][5] -= WINDOW_WIDTH//maxsize
+      
+        if entities[o][0] == entities[0][0]:
+          del(entities[o])
+      except:
+        pass
+    
     # This section will be built out later
  
     # Render elements of the game
@@ -115,8 +169,10 @@ def main () :
       pygame.draw.rect(WINDOW,i[3],ent)
     pygame.display.update()
     fpsClock.tick(FPS)
- 
-main()
+
+
+
+titlescreen()
 
 
 
