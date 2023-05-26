@@ -1,4 +1,4 @@
-import pygame, sys, random, math
+import pygame, sys, random, math, datetime
 from pygame.locals import *
 pygame.init()
 
@@ -13,7 +13,7 @@ WINDOW_WIDTH = 400
 WINDOW_HEIGHT = 400
  
 WINDOW = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-pygame.display.set_caption('My Game!')
+pygame.display.set_caption('Herding Cats')
 
 def definesizes():
   global maxsize, minsize
@@ -73,13 +73,14 @@ def create_entities():
     if i == 0:
       entities.append([o,5,5,(72,216,6),u,u,u,u])
     else:
-      entities.append([o,size,size,random.choice([(200,200,0),(0,0,0),(200,140,0),(240,240,240),(180,180,180)]),u,u,u,u])
+      entities.append([o,size,size,random.choice([(200,200,0),(15,15,15),(200,140,0),(240,240,240),(180,180,180)]),u,u,u,u])
     del(locs[u])
 
 
 # Titlescreen function
 def titlescreen():
-  global gameongoing, characters
+  global gameongoing, characters, score
+  score = 0
   definesizes()
   characterinput()
   characters = int(characters)
@@ -95,17 +96,19 @@ def titlescreen():
       pressed = pygame.key.get_pressed()
       if event.type == pygame.KEYDOWN and event.key == K_h:
         gameongoing = True
+        print(pygame.font.get_fonts()[4])
         main()
       
       #rendering
       WINDOW.fill((200,160,5))
-      title = pygame.font.SysFont(pygame.font.get_fonts()[4], 40)
+      title = pygame.font.SysFont('eufm10', 40)
       surfacetitle = title.render('Herding Cats', True, (200,100,10), None)
       WINDOW.blit(surfacetitle,(WINDOW_WIDTH/6,WINDOW_HEIGHT/4))
       subtitle = pygame.font.Font(None, 25)
       surfacesubtitle = subtitle.render('Press H to begin.', True, (200,120,0), None)
       WINDOW.blit(surfacesubtitle,(WINDOW_WIDTH/6,WINDOW_HEIGHT/2.7))
       pygame.display.update()
+      fpsClock.tick(FPS)
 
 # Win function
 def win():
@@ -114,9 +117,18 @@ def win():
 # The main function that controls the game
 
 def main () :
-  global looping,locs,entities,origlocs, gameongoing
+  global looping,locs,entities,origlocs, gameongoing, score
   looping = True
+  startingtime = datetime.datetime.now()
+  startingtime = str(startingtime)
+  startingtime = startingtime.replace(":","")
+  startingtime = startingtime.replace("-","")
+  startingtime = startingtime.split(".")
+  startingtime = startingtime[0]
+  startingtime = startingtime.replace(" ","")
+  startingtime = int(startingtime)
   
+  scoreshow = False
   # The main game loop
   while looping :
     # Get inputs
@@ -152,11 +164,27 @@ def main () :
           entities[0][5] = 0
         entities[0][0][1] = origlocs[entities[0][5] - WINDOW_WIDTH//maxsize][1]
         entities[0][5] -= WINDOW_WIDTH//maxsize
+      
+      if event.type == pygame.KEYDOWN and event.key == K_h:
+        looping = False
+        titlescreen()
     
     # Processing
+    newtime = datetime.datetime.now()
+    newtime = str(newtime)
+    newtime = newtime.replace(":","")
+    newtime = newtime.replace("-","")
+    newtime = newtime.split(".")
+    newtime = newtime[0]
+    newtime = newtime.replace(" ","")
+    newtime = int(newtime)
+    timetaken = newtime - startingtime
+    
+    
     if len(entities) == 1:
       looping = False
-      titlescreen()
+      scoreshow = True
+      #titlescreen()
     for i in range(len(entities) - 1):
       o = i + 1
       try:
@@ -186,6 +214,7 @@ def main () :
       
         if entities[o][0] == entities[0][0]:
           del(entities[o])
+          score += 100
       except:
         pass
     
@@ -197,9 +226,15 @@ def main () :
       #print(i[0][1],i[0][0])
       ent = pygame.Rect(i[0][0],i[0][1],i[1],i[2])
       pygame.draw.rect(WINDOW,i[3],ent)
+    if scoreshow == True:
+      title = pygame.font.SysFont('eufm10', 40)
+      print(type(timetaken))
+      surfacetitle = title.render('Score: %s' % (score//timetaken), True, (200,100,10), None)
+      WINDOW.blit(surfacetitle,(WINDOW_WIDTH/6,WINDOW_HEIGHT/4))
     pygame.display.update()
     fpsClock.tick(FPS)
-
+    if scoreshow == True:
+      titlescreen()
 
 
 titlescreen()
