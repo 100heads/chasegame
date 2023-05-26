@@ -13,7 +13,7 @@ WINDOW_WIDTH = 400
 WINDOW_HEIGHT = 400
  
 WINDOW = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-pygame.display.set_caption('Herding Cats')
+pygame.display.set_caption('My Game!')
 
 def definesizes():
   global maxsize, minsize
@@ -96,7 +96,14 @@ def titlescreen():
       pressed = pygame.key.get_pressed()
       if event.type == pygame.KEYDOWN and event.key == K_h:
         gameongoing = True
-        print(pygame.font.get_fonts()[4])
+        startingtime = datetime.datetime.now()
+        startingtime = str(startingtime)
+        startingtime = startingtime.replace(":","")
+        startingtime = startingtime.replace("-","")
+        startingtime = startingtime.split(".")
+        startingtime = startingtime[0]
+        startingtime = startingtime.replace(" ","")
+        startingtime = int(startingtime)
         main()
       
       #rendering
@@ -117,17 +124,9 @@ def win():
 # The main function that controls the game
 
 def main () :
-  global looping,locs,entities,origlocs, gameongoing, score
+  global looping,locs,entities,origlocs, gameongoing, score, startingtime
   looping = True
-  startingtime = datetime.datetime.now()
-  startingtime = str(startingtime)
-  startingtime = startingtime.replace(":","")
-  startingtime = startingtime.replace("-","")
-  startingtime = startingtime.split(".")
-  startingtime = startingtime[0]
-  startingtime = startingtime.replace(" ","")
-  startingtime = int(startingtime)
-  
+  paused = False
   scoreshow = False
   # The main game loop
   while looping :
@@ -154,6 +153,7 @@ def main () :
         try:
           entities[0][0][1] = origlocs[entities[0][5] + WINDOW_WIDTH//maxsize][1]
         except:
+          print('debug')
           entities[0][5] = -(WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)) + WINDOW_WIDTH//maxsize
           entities[0][0][1] = origlocs[entities[0][5] + WINDOW_WIDTH//maxsize][1]
         entities[0][5] += WINDOW_WIDTH//maxsize
@@ -164,6 +164,12 @@ def main () :
           entities[0][5] = 0
         entities[0][0][1] = origlocs[entities[0][5] - WINDOW_WIDTH//maxsize][1]
         entities[0][5] -= WINDOW_WIDTH//maxsize
+      
+      if event.type == pygame.KEYDOWN and event.key == K_ESCAPE:
+        if paused == False:
+          looping = False
+        if paused == True:
+          main()
       
       if event.type == pygame.KEYDOWN and event.key == K_h:
         looping = False
@@ -214,7 +220,7 @@ def main () :
       
         if entities[o][0] == entities[0][0]:
           del(entities[o])
-          score += 100
+          score += 1000
       except:
         pass
     
