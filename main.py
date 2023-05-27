@@ -79,7 +79,7 @@ def create_entities():
 
 # Titlescreen function
 def titlescreen():
-  global gameongoing, characters, score
+  global gameongoing, characters, score, startingtime
   score = 0
   definesizes()
   characterinput()
@@ -98,12 +98,14 @@ def titlescreen():
         gameongoing = True
         startingtime = datetime.datetime.now()
         startingtime = str(startingtime)
-        startingtime = startingtime.replace(":","")
+        #startingtime = startingtime.replace(":","")
         startingtime = startingtime.replace("-","")
         startingtime = startingtime.split(".")
         startingtime = startingtime[0]
         startingtime = startingtime.replace(" ","")
-        startingtime = int(startingtime)
+        startingtime = startingtime.split(":")
+        for i in range(len(startingtime)):
+          startingtime[i] = int(startingtime[i])
         main()
       
       #rendering
@@ -128,6 +130,8 @@ def main () :
   looping = True
   paused = False
   scoreshow = False
+  timepaused = 0
+  pauses = list()
   # The main game loop
   while looping :
     # Get inputs
@@ -153,7 +157,7 @@ def main () :
         try:
           entities[0][0][1] = origlocs[entities[0][5] + WINDOW_WIDTH//maxsize][1]
         except:
-          print('debug')
+          #print('debug')
           entities[0][5] = -(WINDOW_WIDTH*WINDOW_HEIGHT//(maxsize*maxsize)) + WINDOW_WIDTH//maxsize
           entities[0][0][1] = origlocs[entities[0][5] + WINDOW_WIDTH//maxsize][1]
         entities[0][5] += WINDOW_WIDTH//maxsize
@@ -167,9 +171,43 @@ def main () :
       
       if event.type == pygame.KEYDOWN and event.key == K_ESCAPE:
         if paused == False:
-          looping = False
-        if paused == True:
-          main()
+          paused = True
+          startingptime = datetime.datetime.now()
+          startingptime = str(startingptime)
+          startingptime = startingptime.replace("-","")
+          startingptime = startingptime.split(".")
+          startingptime = startingptime[0]
+          startingptime = startingptime.replace(" ","")
+          startingptime = startingptime.split(":")
+          for i in range(len(startingptime)):
+            startingptime[i] = int(startingptime[i])
+          while paused == True:
+            newtime = datetime.datetime.now()
+            newtime = str(newtime)
+            newtime = newtime.replace("-","")
+            newtime = newtime.split(".")
+            newtime = newtime[0]
+            newtime = newtime.replace(" ","")
+            newtime = newtime.split(":")
+            for i in range(len(newtime)):
+              newtime[i] = int(newtime[i])
+            
+            for event in pygame.event.get() :
+              if event.type == QUIT :
+                pygame.quit()
+                sys.exit()
+              if event.type == pygame.KEYDOWN and event.key == K_ESCAPE:
+                pauses.append((newtime[1] - startingptime[1])*60 + (newtime[2] - startingptime[2]))
+                timepaused = 0
+                for i in range(len(pauses)):
+                  timepaused += pauses[i]
+                paused = False
+            WINDOW.fill((BACKGROUND[0] - 30,BACKGROUND[1] - 30,BACKGROUND[2] - 30))
+            for i in entities:
+              ent = pygame.Rect(i[0][0],i[0][1],i[1],i[2])
+              pygame.draw.rect(WINDOW,i[3],ent)
+            pygame.display.update()
+            fpsClock.tick(FPS)
       
       if event.type == pygame.KEYDOWN and event.key == K_h:
         looping = False
@@ -178,14 +216,17 @@ def main () :
     # Processing
     newtime = datetime.datetime.now()
     newtime = str(newtime)
-    newtime = newtime.replace(":","")
+    #newtime = newtime.replace(":","")
     newtime = newtime.replace("-","")
     newtime = newtime.split(".")
     newtime = newtime[0]
     newtime = newtime.replace(" ","")
-    newtime = int(newtime)
-    timetaken = newtime - startingtime
-    
+    newtime = newtime.split(":")
+    for i in range(len(newtime)):
+      newtime[i] = int(newtime[i])
+    #print(newtime)
+    #print(int(list(str(newtime))[len(list(str(newtime))) - 5:len(list(str(newtime))) - 3]))
+    timetaken = (newtime[1] - startingtime[1])*60 + (newtime[2] - startingtime[2])
     
     if len(entities) == 1:
       looping = False
@@ -234,7 +275,9 @@ def main () :
       pygame.draw.rect(WINDOW,i[3],ent)
     if scoreshow == True:
       title = pygame.font.SysFont('eufm10', 40)
-      print(type(timetaken))
+      #print(type(timetaken))
+      timetaken -= timepaused
+      print(timetaken)
       surfacetitle = title.render('Score: %s' % (score//timetaken), True, (200,100,10), None)
       WINDOW.blit(surfacetitle,(WINDOW_WIDTH/6,WINDOW_HEIGHT/4))
     pygame.display.update()
